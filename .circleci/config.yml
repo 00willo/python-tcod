@@ -11,39 +11,39 @@ jobs:
       - checkout
       - run:
           name: setup pyenv
-          commands: |
+          command: |
             pyenv install 3.7.0
             pyenv local 3.7.0
       - run:
           name: travis - 1
-          commands: |
+          command: |
             echo 'export DISPLAY=:99.0' >> $BASH_ENV
       - run:
           name: travis - 2
-          commands: |
+          command: |
             sh -e /etc/init.d/xvfb start
       - run:
           name: build setup
-          commands: |
+          command: |
             python -V
             pip install --upgrade pip setuptools
             pip install --pre --upgrade wheel
             pip install -r requirements.txt
       - run:
           name: build
-          commands: |
+          command: |
             python setup.py build -g develop bdist_wheel
       - run:
           name: test setup
-          commands: |
+          command: |
             pip install pytest pytest-cov
       - run:
           name: test
-          commands: |
+          command: |
             pytest -v -rsx
       - run:
           name: post test
-          commands: |
+          command: |
             pip install codacy-coverage python-coveralls codecov
             codecov
             coveralls
