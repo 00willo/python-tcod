@@ -34,17 +34,17 @@ jobs:
       - run:
           name: setup pyenv
           command: |
-            apt-get install -y wget
+            apt-get install -y wget     # for pyenv to download python
             pyenv install 3.7.0
             pyenv local 3.7.0
       - run:
           name: travis - 1
           command: |
-            echo 'export DISPLAY=:99.0' >> $BASH_ENV
+            echo 'export DISPLAY=:99' >> $BASH_ENV
       - run:
           name: travis - 2
           command: |
-            sh -e /etc/init.d/xvfb start
+            Xvfb :99 -screen 0 1280x1024x24
       - run:
           name: build setup
           command: |
