@@ -10,6 +10,9 @@ matrix:
   - python: 3.7
     sudo: required
     dist: xenial
+  - python: 3.7
+    sudo: required
+    dist: bionic
   - os: osx
     language: generic
     env: USE_OPENMP=true
