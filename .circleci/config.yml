@@ -23,10 +23,6 @@ jobs:
             echo 'pyenv virtualenvwrapper' >> ~/.bashrc
             source $BASH_ENV
             source ~/.bashrc
-            exec $SHELL
-            set +e
-            pyenv versions
-            set -e
       - run:
           name: setup to build
           command: |
@@ -38,7 +34,7 @@ jobs:
           command: |
             apt-get install -y wget     # for pyenv to download python
             pyenv install 3.7.0
-            pyenv local 3.7.0
+            pyenv versions
       - run:
           name: travis - 1
           command: |
@@ -51,6 +47,7 @@ jobs:
       - run:
           name: build setup
           command: |
+            pyenv local 3.7.0
             python -V
             pip install --upgrade pip setuptools
             pip install --pre --upgrade wheel
