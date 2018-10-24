@@ -6,49 +6,49 @@ references:
 version: 2
 jobs:
   build:
-    <<: *defaults
+    << : *defaults
     steps:
-     - checkout
-     - run:
-       name: setup pyenv
-       commands: |
-         pyenv install 3.7.0
-         pyenv local 3.7.0
-     - run:
-       name: travis - 1
-       commands: |
-               echo 'export DISPLAY=:99.0' >> $BASH_ENV
-     - run:
-       name: travis - 2
-       commands: |
-         sh -e /etc/init.d/xvfb start
-     - run:
-       name: build setup
-       commands: |
-         python -V
-         pip install --upgrade pip setuptools
-         pip install --pre --upgrade wheel
-         pip install -r requirements.txt
-     - run:
-       name: build
-       commands: |
-         python setup.py build -g develop bdist_wheel
-     - run:
-       name: test setup
-       commands: |
-         pip install pytest pytest-cov
-     - run:
-       name: test
-       commands: |
-         pytest -v -rsx
-     - run:
-       name: post test
-       commands: |
-         pip install codacy-coverage python-coveralls codecov
-         codecov
-         coveralls
-         coverage xml
-         ls -ltr
+      - checkout
+      - run:
+          name: setup pyenv
+          commands: |
+            pyenv install 3.7.0
+            pyenv local 3.7.0
+      - run:
+          name: travis - 1
+          commands: |
+            echo 'export DISPLAY=:99.0' >> $BASH_ENV
+      - run:
+          name: travis - 2
+          commands: |
+            sh -e /etc/init.d/xvfb start
+      - run:
+          name: build setup
+          commands: |
+            python -V
+            pip install --upgrade pip setuptools
+            pip install --pre --upgrade wheel
+            pip install -r requirements.txt
+      - run:
+          name: build
+          commands: |
+            python setup.py build -g develop bdist_wheel
+      - run:
+          name: test setup
+          commands: |
+            pip install pytest pytest-cov
+      - run:
+          name: test
+          commands: |
+            pytest -v -rsx
+      - run:
+          name: post test
+          commands: |
+            pip install codacy-coverage python-coveralls codecov
+            codecov
+            coveralls
+            coverage xml
+            ls -ltr
 
 workflows:
   version: 2
