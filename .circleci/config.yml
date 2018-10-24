@@ -51,6 +51,7 @@ jobs:
          ls -ltr
 
 workflows:
+  version: 2
   build-test:
     jobs:
      - build
