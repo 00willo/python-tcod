@@ -18,8 +18,8 @@ jobs:
             git clone https://github.com/pyenv/pyenv-virtualenvwrapper.git ~/.pyenv/plugins/pyenv-virtualenvwrapper
             echo 'export PYENV_ROOT="$HOME/.pyenv"' >> $BASH_ENV
             echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> $BASH_ENV
-            echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bashrc
-            #echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+            #echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bashrc
+            echo 'eval "$(pyenv init -)"' >> ~/.bashrc
             echo 'pyenv virtualenvwrapper' >> ~/.bashrc
             source $BASH_ENV
             source ~/.bashrc
