@@ -13,6 +13,7 @@ jobs:
           name: get pyenv
           command: |
             apt-get update && apt-get install -y git
+            apt-get install python-pip  # needed for pyenv-virtualenv to initialise
             git clone https://github.com/pyenv/pyenv.git ~/.pyenv
             git clone https://github.com/pyenv/pyenv-virtualenvwrapper.git ~/.pyenv/plugins/pyenv-virtualenvwrapper
             echo 'export PYENV_ROOT="$HOME/.pyenv"' >> $BASH_ENV
@@ -22,6 +23,7 @@ jobs:
             echo 'pyenv virtualenvwrapper' >> ~/.bashrc
             source $BASH_ENV
             source ~/.bashrc
+            exec $SHELL
             set +e
             pyenv versions
             set -e
