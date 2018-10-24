@@ -17,6 +17,8 @@ This is a Python cffi_ port of libtcod_.
 
 This library is `hosted on GitHub <https://github.com/libtcod/python-tcod>`_.
 
+The documentation can be found at https://python-tdl.readthedocs.io/en/latest/
+
 Any issues you have with this module can be reported at the
 `GitHub issue tracker <https://github.com/libtcod/python-tcod/issues>`_.
 
