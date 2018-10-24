@@ -26,8 +26,15 @@ jobs:
             pyenv versions
             set -e
       - run:
+          name: setup to build
+          command: |
+            DEBIAN_FRONTEND=noninteractive apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
+              libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev xz-utils \
+              tk-dev libxml2-dev libxmlsec1-dev libffi-dev
+      - run:
           name: setup pyenv
           command: |
+            apt-get install -y wget
             pyenv install 3.7.0
             pyenv local 3.7.0
       - run:
