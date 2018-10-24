@@ -44,6 +44,7 @@ jobs:
       - run:
           name: travis - 2
           command: |
+            apt-get install -y xvfb
             Xvfb :99 -screen 0 1280x1024x24
       - run:
           name: build setup
