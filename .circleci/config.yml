@@ -50,7 +50,11 @@ jobs:
           name: build setup
           command: |
             source ~/.bashrc
+            python -V
+            export
             pyenv local 3.7.0
+            python -V
+            pyenv global 3.7.0
             python -V
             pip install --upgrade pip setuptools
             pip install --pre --upgrade wheel
@@ -59,6 +63,8 @@ jobs:
           name: build
           command: |
             source ~/.bashrc
+            python -V
+            export
             python setup.py build -g develop bdist_wheel
       - run:
           name: test setup
