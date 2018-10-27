@@ -49,12 +49,17 @@ jobs:
       - run:
           name: build setup
           command: |
+            source $BASH_ENV
             source ~/.bashrc
+            pyenv versions
+            pyenv version
             python -V
             export
             pyenv local 3.7.0
+            pyenv version
             python -V
             pyenv global 3.7.0
+            pyenv version
             python -V
             pip install --upgrade pip setuptools
             pip install --pre --upgrade wheel
