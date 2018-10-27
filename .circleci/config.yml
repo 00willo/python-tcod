@@ -96,7 +96,7 @@ references:
       name: post test
       command: |
         source project-env/bin/activate
-        pip uninstall pytest-cov
+        pip uninstall -y pytest-cov
         pip install codacy-coverage python-coveralls codecov
         #codecov
         coveralls
