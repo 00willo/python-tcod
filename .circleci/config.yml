@@ -103,6 +103,11 @@ references:
         coverage xml
         ls -ltr
 
+  store_package_artifacts: &store_package_artifacts
+    store_artifacts:
+      path: ~/project/dist
+      destination: packages
+
 version: 2
 jobs:
   build-py36:
@@ -114,6 +119,7 @@ jobs:
       - << : *setup_test
       - << : *test
       - << : *post_test
+      - << : *store_package_artifacts
 
   build:
     << : *defaults
