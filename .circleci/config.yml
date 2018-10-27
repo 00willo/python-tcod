@@ -58,7 +58,7 @@ references:
     run:
       name: Build setup
       command: |
-        pyenv version
+        # pyenv version
         python -V
         pip install --upgrade pip setuptools
         pip install --pre --upgrade wheel
@@ -79,14 +79,6 @@ jobs:
     << : *python36
     steps:
       - checkout
-      - << : *update_pip
-      - << : *download_pyenv
-      - << : *configure_pyenv
-      - run:
-          name: Test basic pyenv install
-          command: |
-            cat ~/.bashrc
-            pyenv versions
       - << : *build_setup
       - << : *build_package
 
