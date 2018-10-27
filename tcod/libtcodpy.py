@@ -7,11 +7,14 @@ import os
 import sys
 
 import threading as _threading
+import warnings
 
 import numpy as _np
 import numpy as np
 
 from tcod.libtcod import *
+
+from tcod._internal import deprecate
 
 from tcod.tcod import _int, _unpack_char_p
 from tcod.tcod import _bytes, _unicode, _fmt_bytes, _fmt_unicode
@@ -35,6 +38,9 @@ class ConsoleBuffer(object):
     """Simple console that allows direct (fast) access to cells. simplifies
     use of the "fill" functions.
 
+    .. deprecated:: 6.0
+        Console array attributes perform better than this class.
+
     Args:
         width (int): Width of the new ConsoleBuffer.
         height (int): Height of the new ConsoleBuffer.
@@ -50,6 +56,10 @@ class ConsoleBuffer(object):
         """initialize with given width and height. values to fill the buffer
         are optional, defaults to black with no characters.
         """
+        warnings.warn(
+            "Console array attributes perform better than this class.",
+            stacklevel=2,
+        )
         self.width = width
         self.height = height
         self.clear(back_r, back_g, back_b, fore_r, fore_g, fore_b, char)
@@ -194,6 +204,7 @@ class Dice(_CDataWrapper):
     """
 
     def __init__(self, *args, **kargs):
+        warnings.warn("Using this class is not recommended.", stacklevel=2)
         super(Dice, self).__init__(*args, **kargs)
         if self.cdata == ffi.NULL:
             self._init(*args, **kargs)
@@ -626,7 +637,7 @@ def console_init_root(w, h, title=None, fullscreen=False,
         # Use the scripts filename as the title.
         title = os.path.basename(sys.argv[0])
     lib.TCOD_console_init_root(w, h, _bytes(title), fullscreen, renderer)
-    return tcod.console.Console._from_cdata(ffi.NULL, order)
+    return tcod.console.Console._get_root(order)
 
 
 def console_set_custom_font(fontFile, flags=FONT_LAYOUT_ASCII_INCOL,
@@ -663,7 +674,7 @@ def console_get_width(con):
         int: The width of a Console.
 
     .. deprecated:: 2.0
-        Use `Console.get_width` instead.
+        Use `Console.width` instead.
     """
     return lib.TCOD_console_get_width(_console(con))
 
@@ -677,7 +688,7 @@ def console_get_height(con):
         int: The height of a Console.
 
     .. deprecated:: 2.0
-        Use `Console.get_hright` instead.
+        Use `Console.height` instead.
     """
     return lib.TCOD_console_get_height(_console(con))
 
@@ -855,6 +866,7 @@ def console_set_char_background(con, x, y, col, flag=BKGND_SET):
     """
     lib.TCOD_console_set_char_background(_console(con), x, y, col, flag)
 
+@deprecate("Directly access a consoles foreground color with `console.fg`")
 def console_set_char_foreground(con, x, y, col):
     """Change the foreground color of x,y to col.
 
@@ -867,6 +879,7 @@ def console_set_char_foreground(con, x, y, col):
     """
     lib.TCOD_console_set_char_foreground(_console(con), x, y, col)
 
+@deprecate("Directly access a consoles characters with `console.ch`")
 def console_set_char(con, x, y, c):
     """Change the character at x,y to c, keeping the current colors.
 
@@ -1025,16 +1038,19 @@ def console_get_default_foreground(con):
     return Color._new_from_cdata(
         lib.TCOD_console_get_default_foreground(_console(con)))
 
+@deprecate("Directly access a consoles background color with `console.bg`")
 def console_get_char_background(con, x, y):
     """Return the background color at the x,y of this console."""
     return Color._new_from_cdata(
         lib.TCOD_console_get_char_background(_console(con), x, y))
 
+@deprecate("Directly access a consoles foreground color with `console.fg`")
 def console_get_char_foreground(con, x, y):
     """Return the foreground color at the x,y of this console."""
     return Color._new_from_cdata(
         lib.TCOD_console_get_char_foreground(_console(con), x, y))
 
+@deprecate("Directly access a consoles characters with `console.ch`")
 def console_get_char(con, x, y):
     """Return the character at the x,y of this console."""
     return lib.TCOD_console_get_char(_console(con), x, y)
@@ -2699,6 +2715,7 @@ def sys_get_last_frame_length():
     """
     return lib.TCOD_sys_get_last_frame_length()
 
+@deprecate("Use Python's standard 'time' module instead of this function.")
 def sys_sleep_milli(val):
     """Sleep for 'val' milliseconds.
 
@@ -2710,6 +2727,7 @@ def sys_sleep_milli(val):
     """
     lib.TCOD_sys_sleep_milli(val)
 
+@deprecate("Use Python's standard 'time' module instead of this function.")
 def sys_elapsed_milli():
     """Get number of milliseconds since the start of the program.
 
@@ -2721,6 +2739,7 @@ def sys_elapsed_milli():
     """
     return lib.TCOD_sys_elapsed_milli()
 
+@deprecate("Use Python's standard 'time' module instead of this function.")
 def sys_elapsed_seconds():
     """Get number of seconds since the start of the program.
 
@@ -2739,6 +2758,8 @@ def sys_set_renderer(renderer):
        RENDERER_GLSL and RENDERER_OPENGL are not currently available.
     """
     lib.TCOD_sys_set_renderer(renderer)
+    if tcod.console._root_console is not None:
+        tcod.console.Console._get_root()
 
 def sys_get_renderer():
     """Return the current rendering mode.
@@ -2872,8 +2893,20 @@ def sys_wait_for_event(mask, k, m, flush):
     return lib.TCOD_sys_wait_for_event(
         mask, k.cdata if k else ffi.NULL, m.cdata if m else ffi.NULL, flush)
 
+@deprecate("This function does not provide reliable access to the clipboard.")
 def sys_clipboard_set(text):
+    """Sets the clipboard to `text`.
+
+    .. deprecated:: 6.0
+       This function does not provide reliable access to the clipboard.
+    """
     return lib.TCOD_sys_clipboard_set(text.encode('utf-8'))
 
+@deprecate("This function does not provide reliable access to the clipboard.")
 def sys_clipboard_get():
+    """Return the current value of the clipboard.
+
+    .. deprecated:: 6.0
+       This function does not provide reliable access to the clipboard.
+    """
     return ffi.string(lib.TCOD_sys_clipboard_get()).decode('utf-8')
