@@ -74,6 +74,7 @@ references:
         source project-env/bin/activate
         python -V
         export
+        git submodule update --init --recursive
         python setup.py build -g develop bdist_wheel
 
 
