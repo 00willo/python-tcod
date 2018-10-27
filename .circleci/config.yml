@@ -1,58 +1,11 @@
 references:
-  defaults: &defaults
-    docker:
-      - image: ubuntu:latest
-
   python36: &python36
     docker:
       - image: circleci/python:3.6-stretch-browsers
 
-  get_pyenv: &get_pyenv
-      - run:
-          name: get pyenv
-          command: |
-            apt-get update && apt-get install -y git
-            apt-get install -y python-pip  # needed for pyenv-virtualenv to initialise
-            git clone https://github.com/pyenv/pyenv.git ~/.pyenv
-            git clone https://github.com/pyenv/pyenv-virtualenvwrapper.git ~/.pyenv/plugins/pyenv-virtualenvwrapper
-            echo 'export PYENV_ROOT="$HOME/.pyenv"' >> $BASH_ENV
-            echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> $BASH_ENV
-            #echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bashrc
-            echo 'eval "$(pyenv init -)"' >> ~/.bashrc
-            echo 'pyenv virtualenvwrapper' >> ~/.bashrc
-            source $BASH_ENV
-            source ~/.bashrc
-            pyenv versions      # should show system python at least
-
-  download_pyenv: &download_pyenv
-    run:
-      name: Download pyenv
-      command: |
-        set +e
-        pyenv versions || { echo "pyenv not present, installing"; \
-            git clone https://github.com/pyenv/pyenv.git ~/.pyenv; \
-            git clone https://github.com/pyenv/pyenv-virtualenvwrapper.git ~/.pyenv/plugins/pyenv-virtualenvwrapper; \
-            }
-        set -e
-
-  update_pip: &update_pip
-    run:
-      name: Update pip
-      command: |
-        pip install --upgrade pip
-        pip install --upgrade setuptools
-
-  configure_pyenv: &configure_pyenv
-    run:
-      name: Configure pyenv
-      command: |
-        echo 'export PYENV_ROOT="$HOME/.pyenv"' >> $BASH_ENV
-        echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> $BASH_ENV
-        echo 'eval "$(pyenv init -)"' >> ~/.bashrc
-        echo 'pyenv virtualenvwrapper' >> ~/.bashrc
-        source $BASH_ENV
-        source ~/.bashrc
-        pyenv versions
+  python37: &python37
+    docker:
+      - image: circleci/python:3.7-stretch-browsers
 
   build_setup: &build_setup
     run:
@@ -72,12 +25,10 @@ references:
       name: build
       command: |
         source project-env/bin/activate
-        python -V
-        export
         git submodule update --init --recursive
         python setup.py build -g develop bdist_wheel
 
-  setup_test: &setup_test
+  test_setup: &test_setup
     run:
       name: test setup
       command: |
@@ -96,12 +47,14 @@ references:
       name: post test
       command: |
         source project-env/bin/activate
+        # Removing due package minimum coverage conflicts with python-coveralls
+        # pytest-cov 2.6.0 has requirement coverage>=4.4, but you'll have coverage 4.0.3 which is incompatible.
+        # Collecting coverage==4.0.3 (from python-coveralls)
         pip uninstall -y pytest-cov
         pip install codacy-coverage python-coveralls codecov
-        #codecov
+        codecov
         coveralls
         coverage xml
-        ls -ltr
 
   store_package_artifacts: &store_package_artifacts
     store_artifacts:
@@ -116,102 +69,25 @@ jobs:
       - checkout
       - << : *build_setup
       - << : *build_package
-      - << : *setup_test
+      - << : *test_setup
       - << : *test
       - << : *post_test
       - << : *store_package_artifacts
 
-  build:
-    << : *defaults
+  build-py37:
+    << : *python37
     steps:
       - checkout
-      - run:
-          name: get pyenv
-          command: |
-            apt-get update && apt-get install -y git
-            apt-get install -y python-pip  # needed for pyenv-virtualenv to initialise
-            git clone https://github.com/pyenv/pyenv.git ~/.pyenv
-            git clone https://github.com/pyenv/pyenv-virtualenvwrapper.git ~/.pyenv/plugins/pyenv-virtualenvwrapper
-            echo 'export PYENV_ROOT="$HOME/.pyenv"' >> $BASH_ENV
-            echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> $BASH_ENV
-            #echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bashrc
-            echo 'eval "$(pyenv init -)"' >> ~/.bashrc
-            echo 'pyenv virtualenvwrapper' >> ~/.bashrc
-            source $BASH_ENV
-            source ~/.bashrc
-            pyenv versions      # should show system python at least
-      - run:
-          name: setup to build
-          command: |
-            echo $PATH
-            echo $PYENV_ROOT
-            DEBIAN_FRONTEND=noninteractive apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
-              libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev xz-utils \
-              tk-dev libxml2-dev libxmlsec1-dev libffi-dev
-      - run:
-          name: setup pyenv
-          command: |
-            source ~/.bashrc
-            apt-get install -y wget     # for pyenv to download python
-            pyenv install 3.7.0
-            pyenv versions
-      - run:
-          name: travis - 1
-          command: |
-            echo 'export DISPLAY=:99' >> $BASH_ENV
-      - run:
-          name: travis - 2
-          command: |
-            apt-get install -y xvfb
-            /usr/bin/Xvfb :99 -ac -screen 0 1024x768x24 & > /dev/null 2>&1
-      - run:
-          name: build setup
-          command: |
-            source $BASH_ENV
-            source ~/.bashrc
-            pyenv versions
-            pyenv version
-            python -V
-            export
-            pyenv local 3.7.0
-            pyenv version
-            python -V
-            pyenv global 3.7.0
-            pyenv version
-            python -V
-            pip install --upgrade pip setuptools
-            pip install --pre --upgrade wheel
-            pip install -r requirements.txt
-      - run:
-          name: build
-          command: |
-            source ~/.bashrc
-            python -V
-            export
-            python setup.py build -g develop bdist_wheel
-      - run:
-          name: test setup
-          command: |
-            source ~/.bashrc
-            pip install pytest pytest-cov
-      - run:
-          name: test
-          command: |
-            source ~/.bashrc
-            pytest -v -rsx
-      - run:
-          name: post test
-          command: |
-            source ~/.bashrc
-            pip install codacy-coverage python-coveralls codecov
-            codecov
-            coveralls
-            coverage xml
-            ls -ltr
+      - << : *build_setup
+      - << : *build_package
+      - << : *test_setup
+      - << : *test
+      - << : *post_test
+      - << : *store_package_artifacts
 
 workflows:
   version: 2
   build-test:
     jobs:
       - build-py36
-      - build
+      - build-py37
