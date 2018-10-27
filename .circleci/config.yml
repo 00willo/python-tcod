@@ -81,18 +81,21 @@ references:
     run:
       name: test setup
       command: |
+        source project-env/bin/activate
         pip install pytest pytest-cov
 
   test: &test
     run:
       name: test
       command: |
+        source project-env/bin/activate
         pytest -v -rsx
 
   post_test: &post_test
     run:
       name: post test
       command: |
+        source project-env/bin/activate
         pip install codacy-coverage python-coveralls codecov
         codecov
         coveralls
