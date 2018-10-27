@@ -59,6 +59,7 @@ references:
       name: Build setup
       command: |
         # pyenv version
+        sudo apt-get install gcc python-dev python3-dev libsdl2-dev libffi-dev libomp5
         python -V
         python3 -m venv project-env
         source project-env/bin/activate
