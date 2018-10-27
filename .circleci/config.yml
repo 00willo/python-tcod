@@ -77,6 +77,27 @@ references:
         git submodule update --init --recursive
         python setup.py build -g develop bdist_wheel
 
+  setup_test: &setup_test
+    run:
+      name: test setup
+      command: |
+        pip install pytest pytest-cov
+
+  test: &test
+    run:
+      name: test
+      command: |
+        pytest -v -rsx
+
+  post_test: &post_test
+    run:
+      name: post test
+      command: |
+        pip install codacy-coverage python-coveralls codecov
+        codecov
+        coveralls
+        coverage xml
+        ls -ltr
 
 version: 2
 jobs:
@@ -86,6 +107,9 @@ jobs:
       - checkout
       - << : *build_setup
       - << : *build_package
+      - << : *setup_test
+      - << : *test
+      - << : *post_test
 
   build:
     << : *defaults
