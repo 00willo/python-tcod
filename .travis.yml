@@ -6,12 +6,19 @@ matrix:
     env: CC=gcc-8 CXX=g++-8
   - os: linux
     python: 3.5
+    env: CC=gcc-8 CXX=g++-8
   - os: linux
-    python: "3.6"
+    python: 3.6
     dist: xenial
     sudo: required
+    env: CC=gcc-8 CXX=g++-8
   - os: linux
-    python: "3.7"
+    python: 3.7
+    dist: xenial
+    sudo: required
+    env: CC=gcc-8 CXX=g++-8
+  - os: linux
+    python: nightly
     dist: xenial
     sudo: required
     env: CC=gcc-8 CXX=g++-8
@@ -36,6 +43,7 @@ matrix:
   - env: USE_OPENMP=true
   - python: pypy3.5
   - python: 2.7
+  - python: nightly
 
   fast_finish: true
 
